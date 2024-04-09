@@ -4,10 +4,9 @@ use crossterm::{
     },
 };
 use ratatui::{
-    prelude::{CrosstermBackend, Stylize,Terminal},
-    widgets::{Block, Borders, Paragraph}, Frame,
+    layout::{Constraint, Direction, Layout, Rect}, prelude::{CrosstermBackend,Terminal}, widgets::{Block, Borders, Paragraph}, Frame
 };
-use std::io::{self, Stdout};
+use std::{io::{self, Stdout}};
 use std::error::Error;
 
 fn setup_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn Error>> {
@@ -16,13 +15,45 @@ fn setup_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn Error>
     execute!(stdout, EnterAlternateScreen)?;
     Ok(Terminal::new(CrosstermBackend::new(stdout))?)
 }
-
+fn menu(frame: &mut Frame, rect: Rect) {
+    frame.render_widget(
+        Block::new().borders(Borders::TOP).title("Menu"),
+        rect,
+    );
+}
 fn ui(frame: &mut Frame) {
+    let main_layout = Layout::new(
+        Direction::Vertical,
+        [
+            Constraint::Length(1),
+            Constraint::Min(0),
+            Constraint::Length(1),
+        ],
+    )
+    .split(frame.size());
+    frame.render_widget(
+        Block::new().borders(Borders::TOP).title("Title"),
+        main_layout[0],
+    );
+    let inner_layout = Layout::new(
+        Direction::Horizontal,
+        [
+            Constraint::Max(30),
+            Constraint::Length(1),
+            Constraint::Min(30),
+        ]
+    )
+    .split(main_layout[1]);
+    menu(frame, inner_layout[0]);
     frame.render_widget(
         Paragraph::new("Hello World")
         .block(Block::default().title("Greeting").borders(Borders::ALL)),
-         frame.size(),
+         inner_layout[2],
         );
+    frame.render_widget(
+        Block::new().borders(Borders::TOP).title("Bottom"),
+        main_layout[2],
+    );
 }
 
 fn handle_events() -> io::Result<bool> {
