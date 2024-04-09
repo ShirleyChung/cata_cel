@@ -4,9 +4,9 @@ use crossterm::{
     },
 };
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Rect}, prelude::{CrosstermBackend,Terminal}, widgets::{Block, Borders, Paragraph}, Frame
+    layout::{Constraint, Direction, Layout, Rect}, prelude::{CrosstermBackend,Terminal}, style::{Color, Modifier, Style}, widgets::{Block, Borders, List, ListDirection, Paragraph}, Frame
 };
-use std::{io::{self, Stdout}};
+use std::{default, io::{self, Stdout}};
 use std::error::Error;
 
 fn setup_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn Error>> {
@@ -16,8 +16,17 @@ fn setup_terminal() -> Result<Terminal<CrosstermBackend<Stdout>>, Box<dyn Error>
     Ok(Terminal::new(CrosstermBackend::new(stdout))?)
 }
 fn menu(frame: &mut Frame, rect: Rect) {
+    let items = ["item1", "item2", "item3"];
+    let list = List::new(items)
+    .block(Block::default().title("Menu").borders(Borders::ALL))
+    .style(Style::default().fg(Color::White))
+    .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
+    .highlight_symbol(">>")
+    .repeat_highlight_symbol(true)
+    .direction(ListDirection::BottomToTop);
+
     frame.render_widget(
-        Block::new().borders(Borders::TOP).title("Menu"),
+        list,
         rect,
     );
 }
